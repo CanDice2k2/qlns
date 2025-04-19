@@ -97,7 +97,12 @@ class NhanLuong extends Model
 
     public function getPhuCap($nhanvien_id)
     {
-        return NhanVien::join('phucap as p', 'nhanvien.phucap_id', '=', 'p.id')->select('p.hsphucap')->first()->hsphucap ?? 0;
+        // return NhanVien::join('phucap as p', 'nhanvien.phucap_id', '=', 'p.id')->select('p.hsphucap')->first()->hsphucap ?? 0;
+        $nhanvien = NhanVien::find($nhanvien_id);
+        if (!$nhanvien || !$nhanvien->phucap_id) return 0;
+
+        $phuCap = PhuCap::find($nhanvien->phucap_id);
+        return $phuCap ? $phuCap->hsphucap : 0;
     }
 
     public function getThuongPhat($nhanvien_id, $month, $year, $loai = 1)

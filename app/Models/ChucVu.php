@@ -18,9 +18,9 @@ class ChucVu extends Model
         return $this->where($field ?? 'id', $value)->withTrashed()->firstOrFail();
     }
 
-    public function mucluong()
+    public function phuCap()
     {
-        return $this->hasMany(MucLuong::class, 'id', 'chucvu_id');
+        return $this->hasMany(PhuCap::class, 'chucvu_id', 'id');
     }
 
     public function scopeFilter($query, array $filters)

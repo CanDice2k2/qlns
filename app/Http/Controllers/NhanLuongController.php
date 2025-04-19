@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\NhanLuong;
 use App\Models\NhanVien;
+use App\Models\PhuCap;
+use App\Models\ChucVu;
+use App\Models\PhongBan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
@@ -52,10 +55,17 @@ class NhanLuongController extends Controller
 
     public function create(NhanVien $nhanvien)
     {
+        // Lấy thông tin chức vụ từ nhân viên
+        $phuCap = PhuCap::find($nhanvien->phucap_id);
+        $chucVu = $phuCap ? ChucVu::find($phuCap->chucvu_id) : null;
+        $phongBan = $phuCap ? PhongBan::find($phuCap->phongban_id) : null;
+        // dd($phuCap, $chucVu, $phongBan);
         return Inertia::render('NhanLuong/Create', [
             'nhanvien' => [
                 'id' => $nhanvien->id,
-                'hovaten' => $nhanvien->hovaten
+                'hovaten' => $nhanvien->hovaten,
+                'chucvu' => $chucVu ? $chucVu->tencv : 'Không xác định',
+                'phongban' => $phongBan ? $phongBan->tenpb : 'Không xác định',
             ]
         ]);
     }
@@ -105,6 +115,26 @@ class NhanLuongController extends Controller
 
     public function edit(NhanLuong $nhanluong)
     {
+        // Lấy thông tin chức vụ từ nhân viên
+        $nhanVien = $nhanluong->nhanvien;
+
+        // Cách sửa lỗi:
+        $phuCap = PhuCap::find($nhanVien->phucap_id);
+        $chucVu = $phuCap ? ChucVu::find($phuCap->chucvu_id) : null;
+        $phongBan = $phuCap ? PhongBan::find($phuCap->phongban_id) : null;
+
+        // Kiểm tra và tính toán chi tiết khấu trừ
+        $khauTruDetails = [
+            'bhxh' => $nhanluong->mucluong > 0 ? round($nhanluong->mucluong * 0.08) : 0,
+            'bhyt' => $nhanluong->mucluong > 0 ? round($nhanluong->mucluong * 0.015) : 0,
+            'bhtn' => $nhanluong->mucluong > 0 ? round($nhanluong->mucluong * 0.01) : 0,
+            'thueTNCN' => $nhanluong->khautru > 0 ?
+                max(0, $nhanluong->khautru - ($nhanluong->mucluong > 0 ? round($nhanluong->mucluong * 0.105) : 0)) : 0
+        ];
+
+        // Xóa dd() để cho phép hiển thị view
+        // dd($khauTruDetails);
+
         return Inertia::render('NhanLuong/Edit', [
             'nhanluong' => [
                 'id' => $nhanluong->id,
@@ -125,6 +155,11 @@ class NhanLuongController extends Controller
                 'thuclinh' => $nhanluong->thuclinh,
                 'ngaynhan' => $nhanluong->nam . '-' . str_pad($nhanluong->thang, 2, '0', STR_PAD_LEFT),
                 'deleted_at' => $nhanluong->deleted_at,
+
+                // Bổ sung thông tin chi tiết
+                'chucvu' => $chucVu ? $chucVu->tencv : 'Không xác định',
+                'phongban' => $phongBan ? $phongBan->tenpb : 'Không xác định',
+                'khautru_details' => $khauTruDetails
             ],
         ]);
     }

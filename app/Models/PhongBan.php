@@ -18,9 +18,9 @@ class PhongBan extends Model
         return $this->where($field ?? 'id', $value)->withTrashed()->firstOrFail();
     }
 
-    public function mucluong()
+    public function phuCap()
     {
-        return $this->hasMany(MucLuong::class, 'id', 'phongban_id');
+        return $this->hasMany(PhuCap::class, 'phongban_id', 'id');
     }
 
     public function scopeFilter($query, array $filters)

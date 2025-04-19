@@ -86,7 +86,7 @@ class NhanVien extends Model
 
     public function phucap()
     {
-        return $this->belongsTo(MucLuong::class, 'phucap_id', 'id');
+        return $this->belongsTo(PhuCap::class, 'phucap_id', 'id');
     }
 
     public function ngoaingu()

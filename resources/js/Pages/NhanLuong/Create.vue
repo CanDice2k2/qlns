@@ -30,6 +30,26 @@
           <text-input v-model="form.tamung" :error="form.errors.tamung" class="pr-6 pb-8 w-full lg:w-1/2" type="number" label="Tạm ứng" disabled/>
           <text-input v-model="form.thuclinh" :error="form.errors.thuclinh" class="pr-6 pb-8 w-full lg:w-1/1" type="number" label="Thực lĩnh" disabled/>
         </div>
+        <div class="px-8 py-4 bg-gray-50 border-t border-gray-100">
+          <div class="w-full">
+            <h3 class="font-semibold text-lg mb-2">Công thức tính lương:</h3>
+            <div class="bg-white p-4 rounded shadow">
+              <div class="font-mono text-sm break-words">
+                <strong>Thực lĩnh</strong> = (Lương cơ bản × Hệ số lương + Lương cơ bản × Hệ số lương × Hệ số phụ cấp) ÷ Ngày công chuẩn × Ngày công thực tế - Tạm ứng ± (Thưởng - Phạt) - Khấu trừ(Bảo hiểm, thuế, ...)
+              </div>
+
+              <div class="mt-4 text-sm text-gray-700">
+                <div v-if="form.luongcb && form.heso && form.hsphucap && form.ngaycong && form.ngaycongchuan" class="mt-2">
+                  <strong>Áp dụng:</strong>
+                  ({{ formatNumber(form.luongcb) }} × {{ form.heso }} + {{ formatNumber(form.luongcb) }} × {{ form.heso }} × {{ form.hsphucap/100 }}) ÷ {{ form.ngaycongchuan }} × {{ parseInt(form.ngaycong) + parseInt(form.nghihl || 0) }} - {{ formatNumber(form.tamung || 0) }} {{ getThuongPhat(form.thuong, form.phat) }} - {{ formatNumber(form.khautru || 0) }} = {{ formatNumber(form.thuclinh || 0) }}
+                </div>
+                <div v-else class="mt-2 text-gray-500 italic">
+                  Vui lòng tính lương để xem chi tiết công thức áp dụng.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="px-8 py-4 bg-gray-50 border-t border-gray-100 flex justify-end items-center">
           <loading-button :loading="form.processing" class="btn-indigo" type="submit">Tạo Mới</loading-button>
         </div>
@@ -113,6 +133,19 @@ export default {
             alert('Đã tính lương thành công!');
         });
     },
+    formatNumber(value) {
+      if (!value) return '0';
+      return new Intl.NumberFormat('vi-VN').format(value);
+    },
+    getThuongPhat(thuong, phat) {
+      thuong = parseInt(thuong || 0);
+      phat = parseInt(phat || 0);
+      const tong = thuong - phat;
+
+      if (tong === 0) return '';
+      if (tong > 0) return '+ ' + this.formatNumber(tong);
+      return '- ' + this.formatNumber(Math.abs(tong));
+    }
   },
 }
 </script>

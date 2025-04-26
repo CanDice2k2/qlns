@@ -16,27 +16,9 @@ class BangChamCongController extends Controller
 {
     public function index()
     {
-        if (!empty(Request::get('ngaycong')) && preg_match('/([0-9]{4,4}+)\-([0-9]{2,2}+)\-([0-9]{2,2}+)/', Request::get('ngaycong')))
-            $ngaycong = Request::get('ngaycong');
-        else
-            $ngaycong = date('Y-m-d', time());
-
-        return Inertia::render('BangChamCong/Index', [
-            'ngaycong' => $ngaycong,
-            'chamconglist' => Auth::user()->nhanvien->ngayCongList($ngaycong),
-            'filters' => Request::all('search'),
-            'nhanvien' => Auth::user()->nhanvien
-                ->latest('nhanvien.created_at')
-                ->filter(Request::only('search'))
-                ->paginate(1000)
-                ->withQueryString()
-                ->through(fn ($nhanvien) => [
-                    'id' => $nhanvien->id,
-                    'manv' => 'NV' . str_pad($nhanvien->id, 3, '0', STR_PAD_LEFT),
-                    'hovaten' => $nhanvien->hovaten,
-                    'email' => $nhanvien->user->email,
-                    'nghiviec' => (new NghiViec())->checkNgayNghi($nhanvien->id, $ngaycong)
-                ]),
+        return redirect()->route('chamcong.monthly', [
+            'month' => date('m'),
+            'year' => date('Y')
         ]);
     }
 

@@ -127,8 +127,19 @@ Route::get('/img/{path}', [ImagesController::class, 'show'])
     ->name('image');
 
 // ChamCong
-Route::get('chamcong', [ChamCongController::class, 'index'])
-    ->name('chamcong')
+Route::get('chamcong', function () {
+    return redirect()->route('chamcong.monthly', [
+        'month' => date('m'),
+        'year' => date('Y')
+    ]);
+})->name('chamcong')->middleware('auth');
+
+Route::get('chamcong/thang/{month?}/{year?}', [ChamCongController::class, 'monthly'])
+    ->name('chamcong.monthly')
+    ->middleware('auth');
+
+Route::post('chamcong/toggle', [ChamCongController::class, 'toggleAttendance'])
+    ->name('chamcong.toggle')
     ->middleware('auth');
 
 Route::get('chamcong/{nhanvien}/create', [ChamCongController::class, 'create'])
@@ -154,7 +165,6 @@ Route::delete('chamcong/{chamcong}', [ChamCongController::class, 'destroy'])
 Route::put('chamcong/{chamcong}/restore', [ChamCongController::class, 'restore'])
     ->name('chamcong.restore')
     ->middleware('auth');
-
 
 // BangCap
 

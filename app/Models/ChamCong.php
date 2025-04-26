@@ -13,6 +13,11 @@ class ChamCong extends Model
 
     protected $table = 'chamcong';
 
+    protected $fillable = [
+        'nhanvien_id',
+        'created_at'
+    ];
+
     public function resolveRouteBinding($value, $field = null)
     {
         return $this->where($field ?? 'id', $value)->withTrashed()->firstOrFail();

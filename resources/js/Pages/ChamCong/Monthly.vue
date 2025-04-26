@@ -171,7 +171,11 @@ export default {
     },
   },
   created() {
+    // Đổi cách lấy CSRF token
     axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Hoặc phương pháp này (thử nếu cách trên không hoạt động)
+    // axios.defaults.withCredentials = true;
   },
   methods: {
     reset() {
@@ -193,24 +197,22 @@ export default {
       this.loading = true;
 
       try {
-        const date = `${this.year}-${String(this.month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        // Đảm bảo format ngày chính xác
+        const date = `${this.currentYear}-${String(this.currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-        await axios.post('/chamcong/toggle', {
-            nhanvien_id: nhanvienId,
-            date: date
-        }, {
-            headers: {
-                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
+        // Thêm token trực tiếp vào request để đảm bảo
+        const response = await axios.post('/chamcong/toggle', {
+          nhanvien_id: nhanvienId,
+          date: date,
+          _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         });
 
+        // Reload với inertia
         this.$inertia.reload();
       } catch (error) {
         console.error('Error toggling attendance:', error);
-        console.error('Response:', error.response ? error.response.data : 'No response data');
-        alert('Có lỗi xảy ra khi cập nhật chấm công. Kiểm tra console để biết thêm chi tiết.');
+        // Hiển thị thông báo chi tiết hơn
+        alert(`Có lỗi xảy ra khi cập nhật chấm công: ${error.response?.data?.message || error.message}`);
       } finally {
         this.loading = false;
       }

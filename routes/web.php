@@ -140,7 +140,7 @@ Route::get('chamcong/thang/{month?}/{year?}', [ChamCongController::class, 'month
 
 Route::post('chamcong/toggle', [ChamCongController::class, 'toggleAttendance'])
     ->name('chamcong.toggle')
-    ->middleware('auth');
+    ->middleware(['web', 'auth']);
 
 Route::get('chamcong/{nhanvien}/create', [ChamCongController::class, 'create'])
     ->name('chamcong.create')

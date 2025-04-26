@@ -13,5 +13,6 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'nhanvien/import',
+        'chamcong/toggle',
     ];
 }

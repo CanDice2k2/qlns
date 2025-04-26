@@ -171,9 +171,6 @@ export default {
     },
   },
   created() {
-    // Đổi cách lấy CSRF token
-    axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
     // Hoặc phương pháp này (thử nếu cách trên không hoạt động)
     // axios.defaults.withCredentials = true;
   },
@@ -197,22 +194,18 @@ export default {
       this.loading = true;
 
       try {
-        // Đảm bảo format ngày chính xác
         const date = `${this.currentYear}-${String(this.currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-        // Thêm token trực tiếp vào request để đảm bảo
+        // Sử dụng axios thay vì fetch
         const response = await axios.post('/chamcong/toggle', {
           nhanvien_id: nhanvienId,
-          date: date,
-          _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          date: date
         });
 
-        // Reload với inertia
         this.$inertia.reload();
       } catch (error) {
-        console.error('Error toggling attendance:', error);
-        // Hiển thị thông báo chi tiết hơn
-        alert(`Có lỗi xảy ra khi cập nhật chấm công: ${error.response?.data?.message || error.message}`);
+        console.error('Error:', error);
+        alert(`Có lỗi xảy ra: ${error.message}`);
       } finally {
         this.loading = false;
       }
